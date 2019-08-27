@@ -1,5 +1,8 @@
 # vue3 渲染器详解（一）
 
+[vue3 渲染器详解（一）](https://github.com/HJianfeng/vue-source)  
+[vue3 渲染器详解（二）](https://github.com/HJianfeng/vue-source/blob/master/README1.md)  
+[vue3 渲染器详解（三）](https://github.com/HJianfeng/vue-source/blob/master/README2.md)  
 ## 前言
 渲染器是vue的核心，控制着vue生命周期里视图的挂载、更新和渲染。vue在它的第三个版本`vue3`里重写了整个虚拟DOM也就是渲染器的代码，使之可以用更有效的代码来创建虚拟节点。所以这篇我们的主题就是深度理解`vue3`渲染器的原理，并且根据`vue3`的思想手写一个渲染器。因为篇幅较多，所以可能会分两到三篇的文章来剖析它的核心。
 
@@ -100,7 +103,7 @@ if (flags & VNodeFlags.ELEMENT) {
 我们采用位运算来判断种类，因为在一次挂载任务中这种判断很可能大量的进行，使用位运算在一定程度上再次拉升了运行时性能，相比而言，位掩码的运算速度远比直接判断 ```===``` 运算的高，除却函数调用带来额外开销，位运算发生于系统底层。  
 把```VNodeFlags```整理成表格的话，我们就能很清楚的理解为什么可以用位操作符 & 来判断。
 | VNodeFlags | 左移运算 | 32位的bit序列 |
-| :------| ------: | :------: |
+| ------ | ------ | ------ |
 | ELEMENT_HTML | 无 | 00000000`1` |
 | ELEMENT_SVG | 1 << 1 | 0000000`1`0 |
 | COMPONENT_STATEFUL_NORMAL | 1 << 2 | 000000`1`00 |
