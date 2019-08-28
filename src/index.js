@@ -1,30 +1,28 @@
 import { h } from './h'
 import { render } from './render'
 
-const handler = () => alert('clicked')
+// 子组件 - 函数式组件
+function MyFunctionalComp(props) {
+  return h('div', null, props.text)
+}
+// 父组件类
+class ParentComponent {
+  localState = 'one'
 
-// 旧的 VNode
-const prevVNode = h('div', {
-  style: {
-    width: '100px',
-    height: '100px',
-    backgroundColor: 'red'
-  },
-  onclick: handler
-})
-
-// 新的 VNode
-const nextVNode = h('div', {
-  style: {
-    width: '100px',
-    height: '100px',
-    border: '1px solid green'
+  mounted() {
+    setTimeout(() => {
+      this.localState = 'two'
+      this._update()
+    }, 2000)
   }
-})
 
-render(prevVNode, document.getElementById('app'))
+  render() {
+    return h(MyFunctionalComp, {
+      text: this.localState
+    })
+  }
+}
 
-// 2秒后更新
-setTimeout(() => {
-  render(nextVNode, document.getElementById('app'))
-}, 2000)
+// 有状态组件 VNode
+const compVNode = h(ParentComponent)
+render(compVNode, document.getElementById('app'))

@@ -176,23 +176,78 @@ function mountComponent(vnode, container, isSVG) {
     mountFunctionalComponent(vnode, container, isSVG)
   }
 }
+
 function mountStatefulComponent(vnode, container, isSVG) {
   // 创建组件实例
-  const instance = new vnode.tag();
-  // 渲染 VNode
-  instance.$vnode = instance.render()
-  // 挂载
-  mount(instance.$vnode, container, isSVG);
-  // el 属性值 和 组件实例的 $el 属性都引用组件的根DOM元素
-  instance.$el = vnode.el = instance.$vnode.el
+  const instance = (vnode.children = new vnode.tag())
+  // 初始化 props 新增
+  instance.$props = vnode.data
+  
+  instance._update = function() {
+    // 如果 instance._mounted 为真，说明组件已挂载，应该执行更新操作
+    if (instance._mounted) {
+        // 1、拿到旧的 VNode
+        const prevVNode = instance.$vnode
+        // 2、重渲染新的 VNode
+        const nextVNode = (instance.$vnode = instance.render())
+        // 3、patch 更新
+        patch(prevVNode, nextVNode, prevVNode.el.parentNode)
+        // 4、更新 vnode.el 和 $el
+        instance.$el = vnode.el = instance.$vnode.el
+    } else {
+        // 1、渲染VNode
+        instance.$vnode = instance.render()
+        // 2、挂载
+        mount(instance.$vnode, container, isSVG)
+        // 3、组件已挂载的标识
+        instance._mounted = true
+        // 4、el 属性值 和 组件实例的 $el 属性都引用组件的根DOM元素
+        instance.$el = vnode.el = instance.$vnode.el
+        // 5、调用 mounted 钩子
+        instance.mounted && instance.mounted()
+    }
+  }
+
+  instance._update()
 }
+
 function mountFunctionalComponent(vnode, container, isSVG) {
-  // 获取 VNode
-  const $vnode = vnode.tag()
-  // 挂载
-  mount($vnode, container, isSVG)
-  // el 元素引用该组件的根元素
-  vnode.el = $vnode.el
+  // 在函数式组件类型的 vnode 上添加 handle 属性，它是一个对象
+  vnode.handle = {
+    prev: null,
+    next: vnode,
+    container,
+    update: () => {
+      // 如果存在 prev 属性，说明不是第一次挂载
+      if (vnode.handle.prev) {
+        // 更新
+        // prevVNode 是旧的组件VNode，nextVNode 是新的组件VNode
+        const prevVNode = vnode.handle.prev
+        const nextVNode = vnode.handle.next
+        // prevTree 是组件产出的旧的 VNode，我们之前把实例保存在 children 里
+        const prevTree = prevVNode.children
+        // 更新 props 数据
+        const props = nextVNode.data
+        // nextTree 是组件产出的新的 VNode
+        const nextTree = (nextVNode.children = nextVNode.tag(props))
+        // 调用 patch 函数更新
+        patch(prevTree, nextTree, vnode.handle.container)
+      } else {
+        // 初始化 props
+        const props = vnode.data
+        // 获取 VNode
+        const $vnode = (vnode.children = vnode.tag(props))
+        // 挂载
+        mount($vnode, container, isSVG)
+        // el 元素引用该组件的根元素
+        vnode.el = $vnode.el
+      }
+      
+    }
+  }
+
+  // 立即调用 vnode.handle.update 完成初次挂载
+  vnode.handle.update()
 }
 
 

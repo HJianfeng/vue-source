@@ -54,8 +54,6 @@ export function h(tag, data = null, children = null) {
     children = createTextVNode(children + '');
   }
 
-
-
   return {
     _isVNode: true,
     flags,

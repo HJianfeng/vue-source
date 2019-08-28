@@ -122,9 +122,9 @@ if (flags & VNodeFlags.ELEMENT) {
 | ELEMENT | 0000000`1` `1` |
 | COMPONENT_STATEFUL | 0000`1` `1` `1`00|
 | COMPONENT | 000`1` `1` `1` `1`00|
+
 所以可以看出只有`VNodeFlags.ELEMENT_HTML`和```VNodeFlags.ELEMENT_SVG```与
 ```VNodeFlags.ELEMENT``` 进行位与（&）运算，才会得到非零值，即为真。
-
 ##### ChildrenFlags
 同样的我们需要定义一下 children 的flags
 ```javascript
