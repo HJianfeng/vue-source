@@ -38,7 +38,9 @@ const textVNode = {
 如上，由于文本节点没有标签名字，所以它的 tag 属性值为 null。由于文本节点也无需用额外的 VNodeData 来描述附加属性，所以其 data 属性值也是 null。
 
 VNode 可以描述不同的事物，总的来说我们可以分为这5种情况。  
+
 ![](https://user-gold-cdn.xitu.io/2019/8/26/16ccbcff6e09e2fd?w=1560&h=672&f=png&s=69572)
+
 Fragment 和 Portal是比较特殊的组件，当渲染器在渲染 VNode 时，如果发现该 VNode 的类型是 Fragment，就只需要把该 VNode 的子节点渲染到页面。就相当于 vue2 里面的 template 标签。再来看看 Portal，它允许你把内容渲染到任何地方。什么意思呢，看个例子
 ```html
 <template>
