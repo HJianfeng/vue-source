@@ -1,5 +1,6 @@
 import { VNodeFlags, ChildrenFlags } from './flags'
 import { mount } from './render'
+import diff from './diff'
 
 export function patch(prevVNode, nextVNode, container) {
   // 分别拿到新旧 VNode 的类型，即 flags
@@ -73,6 +74,7 @@ function patchElement (prevVNode, nextVNode, container) {
 }
 
 // 更新VNodeData
+const domPropsRE = /\W|^(?:value|checked|selected|muted)$/
 export function patchData(el, key, prevValue, nextValue) {
   switch (key) {
     case 'style':
@@ -120,7 +122,6 @@ function patchChildren(
   nextChildren,
   container
 ) {
-
   switch (prevChildFlags) {
     // 旧的 children 是单个子节点，会执行该 case 语句块
     case ChildrenFlags.SINGLE_VNODE:
@@ -179,14 +180,8 @@ function patchChildren(
         break
         default:
         // 新的 children 中有多个子节点时
-        // 我们暂时使用这种方式，等下一章我们再专门讲diff算法
-        for (let i = 0; i < prevChildren.length; i++) {
-            container.removeChild(prevChildren[i].el)
-        }
-        for (let i = 0; i < nextChildren.length; i++) {
-            mount(nextChildren[i], container);
-        }
-        // 最好的处理方式 diff 算法
+        // diff
+        diff(prevChildren, nextChildren, container);
         break;
       }
       break;

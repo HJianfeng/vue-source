@@ -22,12 +22,12 @@ function render(vnode, container) {
   }
 }
 
-function mount(vnode, container, isSVG) {
+function mount(vnode, container, isSVG, refNode) {
   const { flags } = vnode
 
   if (flags & VNodeFlags.ELEMENT) {
     // 挂载普通标签
-    mountElement(vnode, container, isSVG)
+    mountElement(vnode, container, isSVG, refNode)
   } else if (flags & VNodeFlags.COMPONENT) {
     // 挂载组件
     mountComponent(vnode, container, isSVG)
@@ -43,51 +43,12 @@ function mount(vnode, container, isSVG) {
   }
 }
 
-function mountElement(vnode, container, isSVG) {
+function mountElement(vnode, container, isSVG, refNode) {
   isSVG = isSVG || vnode.flags & VNodeFlags.ELEMENT_SVG
   const el = isSVG
     ? document.createElementNS('http://www.w3.org/2000/svg', vnode.tag)
     : document.createElement(vnode.tag)
   vnode.el = el
-  // 拿到 VNodeData
-  // const data = vnode.data;
-  // const domPropsRE = /\W|^(?:value|checked|selected|muted)$/
-  // if (data) {
-  //   for (let key in data) {
-  //     switch (key) {
-  //       case 'style':
-  //         for (let k in data.style) {
-  //           el.style[k] = data.style[k]
-  //         }
-  //         break
-  //       case 'class':
-  //         if (isSVG) {
-  //           el.setAttribute('class', data[key])
-  //         } else {
-  //           el.className = data[key]
-  //         }
-  //         break
-  //       default:
-  //         if (key[0] === 'o' && key[1] === 'n') {
-  //           // 移除旧事件
-  //           if (prevValue) {
-  //             el.removeEventListener(key.slice(2), prevValue)
-  //           }
-  //           // 添加新事件
-  //           if (nextValue) {
-  //             el.addEventListener(key.slice(2), nextValue)
-  //           }
-  //         } else if (domPropsRE.test(key)) {
-  //           // 当作 DOM Prop 处理
-  //           el[key] = data[key]
-  //         } else {
-  //           // 当作 Attr 处理
-  //           el.setAttribute(key, data[key])
-  //         }
-  //         break
-  //     }
-  //   }
-  // }
 
   // 使用封装后的 patchData
   const data = vnode.data
@@ -111,7 +72,7 @@ function mountElement(vnode, container, isSVG) {
       }
     }
   }
-  container.appendChild(el)
+  refNode ? container.insertBefore(el, refNode) : container.appendChild(el)
 }
 // 挂载文本
 function mountText(vnode, container) {
